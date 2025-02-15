@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
   private Drivetrain drivetrain;
   private Ballgrabber ballGrabber;
   private Pigeon2 pigeon;
+  private boolean intakeSwitch;
   public Robot() {
   frontLeft = new TalonFX(4);
   frontRight = new TalonFX(3);
@@ -38,6 +39,7 @@ public class Robot extends TimedRobot {
   pigeon =  new Pigeon2(0);
   pigeon.reset();
   ballGrabber = new Ballgrabber(5);
+  intakeSwitch = false;
 }
 
   @Override
@@ -54,19 +56,37 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), stick.getZ(),-pigeon.getRotation2d().getRadians());
-    //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), stick.getZ());
+    drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ(),-pigeon.getRotation2d().getRadians());
+    //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
     if (stick.getTriggerPressed() == true){
         pigeon.reset();
     }
-     System.out.println(pigeon.getRotation2d());
+     //System.out.println(pigeon.getRotation2d());
 
      if (stick.getRawButtonPressed(5)){
-      ballGrabber.startGrabber(stick.getThrottle());
+        intakeSwitch = true;
+//            gives negative values to the motor.    ^
      }
      if (stick.getRawButtonPressed(3)){
       ballGrabber.stopGrabber();
+      intakeSwitch = false;
      }
+
+
+     if (stick.getRawButton(2)){
+     double fixedSpeed = speedFix(stick.getRawAxis(3));
+      ballGrabber.startGrabber(fixedSpeed);
+     } 
+     if (intakeSwitch){
+      ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
+     }
+      //else {ballGrabber.stopGrabber();
+      //}
+  }
+
+  public double speedFix(double oldSpeed)  {
+    double speedNew = (oldSpeed + 1) / 2;
+    return speedNew;
   }
 
   @Override
