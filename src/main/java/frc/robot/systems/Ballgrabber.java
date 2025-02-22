@@ -22,8 +22,13 @@ public class Ballgrabber {
 
        // ,int solenoid1Id,int solenoid2Id
         config = new SparkFlexConfig();
+<<<<<<< HEAD
         motor = new SparkFlex(motorId, MotorType.kBrushless);
         config.idleMode(IdleMode.kCoast);
+=======
+        motor = new SparkFlex(deviceId, MotorType.kBrushless);
+        config.idleMode(IdleMode.kBrake);
+>>>>>>> ef89bd0a4c94fa6af2ff41fb5b2492a4c2cc8f03
         config.inverted(true);
        // compressor = new Compressor(PneumaticsModuleType.REVPH);
        // compressor.enableDigital();

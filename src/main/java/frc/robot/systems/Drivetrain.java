@@ -11,9 +11,8 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 
 import edu.wpi.first.math.MathUtil;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.hardware.Pigeon2;
-
-
+import com.studica.frc.AHRS;
+import edu.wpi.first.wpilibj.Timer;
 public class Drivetrain {
     
     TalonFX dtFrontLeft;
@@ -31,8 +30,9 @@ public class Drivetrain {
     DutyCycleOut dutycyclebl;
     DutyCycleOut dutycyclebr;
     double dtDeadband;
-    Pigeon2 gyro;
-    public Drivetrain(TalonFX frontLeft,TalonFX frontRight,TalonFX backLeft,TalonFX backRight, double deadband){
+    AHRS gyro;
+    Timer timer;
+    public Drivetrain(TalonFX frontLeft,TalonFX frontRight,TalonFX backLeft,TalonFX backRight, AHRS passedGyro, double deadband){
         dtFrontLeft = frontLeft;
         dtFrontRight = frontRight;
         dtBackLeft = backLeft;
@@ -52,16 +52,28 @@ public class Drivetrain {
         frontRightConfigurator = dtFrontRight.getConfigurator();
         backLeftConfigurator = dtBackLeft.getConfigurator();
         backRightConfigurator = dtBackRight.getConfigurator();
-        gyro = new Pigeon2(0);
-
+        gyro = passedGyro;
+        timer = new Timer();
         frontLeftConfigurator.apply(leftConfig);
         frontRightConfigurator.apply(rightConfig);
         backLeftConfigurator.apply(leftConfig);
         backRightConfigurator.apply(rightConfig);
+        
     } 
 
-   public void fieldOrientedDrive(double xSpeed, double ySpeed, double zSpeed, double gyroAngleRad){
-        List<Double> wheelSpeeds = getWheelSpeeds(xSpeed, ySpeed, zSpeed, gyroAngleRad);
+   public void timedDrive(double time, double xSpeed, double ySpeed, double zSpeed){
+        
+    
+    fieldOrientedDrive(xSpeed,ySpeed,zSpeed);
+    
+    
+
+    stop();
+   }
+   
+   
+    public void fieldOrientedDrive(double xSpeed, double ySpeed, double zSpeed){
+        List<Double> wheelSpeeds = getWheelSpeeds(xSpeed, ySpeed, zSpeed, Math.toRadians(gyro.getAngle()));
        
         /*dutycyclefl.Output = wheelSpeeds.get(0);
         dutycyclefr.Output = wheelSpeeds.get(1);
@@ -79,7 +91,15 @@ public class Drivetrain {
         dtBackLeft.set(wheelSpeeds.get(2));
         dtBackRight.set(wheelSpeeds.get(3));
     }
-    
+    public void stop(){
+        fieldOrientedDrive(0, 0, 0);
+    }
+
+    public void resetGyro(){
+        gyro.reset();
+
+    }
+
     public void arcadeDrive(double xSpeed, double ySpeed, double zSpeed){
         List<Double> wheelSpeeds = getWheelSpeeds(xSpeed, ySpeed, zSpeed, 0);
 

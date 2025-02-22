@@ -14,9 +14,9 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import frc.robot.systems.Drivetrain;
-import com.ctre.phoenix6.hardware.Pigeon2;
+import com.studica.frc.AHRS;
 import frc.robot.systems.Ballgrabber;
-
+import edu.wpi.first.wpilibj.Timer;
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   private Joystick stick;
   private Drivetrain drivetrain;
   private Ballgrabber ballGrabber;
-  private Pigeon2 pigeon;
+  private AHRS gyro;
   private boolean intakeSwitch;
   private final Compressor compressor;
   private static final String kDefaultAuto = "Auto1";
@@ -48,9 +48,6 @@ public class Robot extends TimedRobot {
     backLeft = new TalonFX(1);
     backRight = new TalonFX(2);
     stick = new Joystick(1);
-    drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight, 0.1 );
-    pigeon = new Pigeon2(0);
-    pigeon.reset();
     ballGrabber = new Ballgrabber(5);//,6,7
     intakeSwitch = false;
     compressor = new Compressor(PneumaticsModuleType.REVPH);
@@ -60,6 +57,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", autoChooser);
 
 
+  private Timer timer;
+  private boolean autoEnd;
+  gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+  drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro,0.1 );
+  timer = new Timer();
 }
 
   @Override
@@ -85,12 +87,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ(),-pigeon.getRotation2d().getRadians());
+    drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
     //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
     if (stick.getTriggerPressed() == true){
-        pigeon.reset();
+      drivetrain.resetGyro();
     }
-     //System.out.println(pigeon.getRotation2d());
 
      if (stick.getRawButtonPressed(5)){
         intakeSwitch = true;
@@ -103,7 +104,7 @@ public class Robot extends TimedRobot {
 
      if (stick.getRawButton(2)){
      double fixedSpeed = speedFix(stick.getRawAxis(3));
-      ballGrabber.startGrabber(fixedSpeed);
+      ballGrabber.startGrabber(-fixedSpeed);
      } 
      if (intakeSwitch){
       ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
