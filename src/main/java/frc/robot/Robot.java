@@ -6,10 +6,15 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.systems.Drivetrain;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.systems.Ballgrabber;
+
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -29,17 +34,25 @@ public class Robot extends TimedRobot {
   private Ballgrabber ballGrabber;
   private Pigeon2 pigeon;
   private boolean intakeSwitch;
+  private final Compressor compressor;
+  
+
   public Robot() {
-  frontLeft = new TalonFX(4);
-  frontRight = new TalonFX(3);
-  backLeft = new TalonFX(1);
-  backRight = new TalonFX(2);
-  stick = new Joystick(1);
-  drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight, 0.1 );
-  pigeon =  new Pigeon2(0);
-  pigeon.reset();
-  ballGrabber = new Ballgrabber(5);
-  intakeSwitch = false;
+    frontLeft = new TalonFX(4);
+   frontRight = new TalonFX(3);
+   backLeft = new TalonFX(1);
+    backRight = new TalonFX(2);
+    stick = new Joystick(1);
+    drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight, 0.1 );
+   pigeon =  new Pigeon2(0);
+   pigeon.reset();
+    ballGrabber = new Ballgrabber(5,6,7 );
+    intakeSwitch = false;
+    compressor = new Compressor(PneumaticsModuleType.REVPH);
+    compressor.enableDigital();
+    
+
+
 }
 
   @Override
@@ -65,7 +78,6 @@ public class Robot extends TimedRobot {
 
      if (stick.getRawButtonPressed(5)){
         intakeSwitch = true;
-//            gives negative values to the motor.    ^
      }
      if (stick.getRawButtonPressed(3)){
       ballGrabber.stopGrabber();
