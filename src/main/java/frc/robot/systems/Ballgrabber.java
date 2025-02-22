@@ -12,7 +12,7 @@ public class Ballgrabber {
     public Ballgrabber(int deviceId){
         config = new SparkFlexConfig();
         motor = new SparkFlex(deviceId, MotorType.kBrushless);
-        config.idleMode(IdleMode.kCoast);
+        config.idleMode(IdleMode.kBrake);
         config.inverted(true);
 
 
