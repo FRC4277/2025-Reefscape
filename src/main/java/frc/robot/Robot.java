@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
     drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight, 0.1 );
     pigeon = new Pigeon2(0);
     pigeon.reset();
-    ballGrabber = new Ballgrabber(5,6,7 );
+    ballGrabber = new Ballgrabber(5);//,6,7
     intakeSwitch = false;
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     compressor.enableDigital();
@@ -68,14 +68,17 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     
-    autoSelected = autoChooser.getSelected();
-    System.out.println("Auto selected: " + autoSelected);
+    
 
 
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+
+    autoSelected = autoChooser.getSelected();
+    System.out.println("Auto selected: " + autoSelected);
+  }
 
   @Override
   public void teleopInit() {}
@@ -105,7 +108,9 @@ public class Robot extends TimedRobot {
      if (intakeSwitch){
       ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
      }
-     if (stick.getRawButton(4)){
+
+   /*   
+   if (stick.getRawButton(4)){
 
       ballGrabber.pneumaticsExtend();
      }
@@ -114,7 +119,7 @@ public class Robot extends TimedRobot {
 
      ballGrabber.pneumaticsRetract();
     }
-  }
+ */ }
 
   public double speedFix(double oldSpeed)  {
     double speedNew = (oldSpeed + 1) / 2;
@@ -123,7 +128,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {}
-
+//mogus
   @Override
   public void disabledPeriodic() {}
 

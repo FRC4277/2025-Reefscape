@@ -13,20 +13,22 @@ import edu.wpi.first.wpilibj.Solenoid;
 public class Ballgrabber {
     SparkFlex motor;
     SparkFlexConfig config;
-    private final Compressor compressor;
-    private final Solenoid solenoid1;
-    private final Solenoid solenoid2;
+   // private final Compressor compressor;
+   // private final Solenoid solenoid1;
+   // private final Solenoid solenoid2;
 
 
-    public Ballgrabber(int motorId,int solenoid1Id,int solenoid2Id){
+    public Ballgrabber(int motorId){
+
+       // ,int solenoid1Id,int solenoid2Id
         config = new SparkFlexConfig();
         motor = new SparkFlex(motorId, MotorType.kBrushless);
         config.idleMode(IdleMode.kCoast);
         config.inverted(true);
-        compressor = new Compressor(PneumaticsModuleType.REVPH);
-        compressor.enableDigital();
-        solenoid1 = new Solenoid(PneumaticsModuleType.REVPH,solenoid1Id);
-        solenoid2 = new Solenoid(PneumaticsModuleType.REVPH,solenoid2Id);
+       // compressor = new Compressor(PneumaticsModuleType.REVPH);
+       // compressor.enableDigital();
+       // solenoid1 = new Solenoid(PneumaticsModuleType.REVPH,solenoid1Id);
+       // solenoid2 = new Solenoid(PneumaticsModuleType.REVPH,solenoid2Id);
         motor.configure(config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     }
     public void startGrabber(double setSpeed){
@@ -36,7 +38,7 @@ public class Ballgrabber {
         motor.set(0);
     }
     
-    public void pneumaticsExtend(){
+   /*  public void pneumaticsExtend(){
         solenoid1.set(true);
         solenoid2.set(true);
 
@@ -47,7 +49,8 @@ public class Ballgrabber {
         solenoid1.set(false);
         solenoid2.set(false);
 
-
-
-    }
 }
+*/
+    
+}
+//mogus
