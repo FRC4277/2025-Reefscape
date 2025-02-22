@@ -5,12 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.systems.Drivetrain;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import frc.robot.systems.Ballgrabber;
@@ -35,22 +37,27 @@ public class Robot extends TimedRobot {
   private Pigeon2 pigeon;
   private boolean intakeSwitch;
   private final Compressor compressor;
-  
+  private static final String kDefaultAuto = "Auto1";
+  private static final String kCustomAuto = "Auto2";
+  private String autoSelected;
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
 
   public Robot() {
     frontLeft = new TalonFX(4);
-   frontRight = new TalonFX(3);
-   backLeft = new TalonFX(1);
+    frontRight = new TalonFX(3);
+    backLeft = new TalonFX(1);
     backRight = new TalonFX(2);
     stick = new Joystick(1);
     drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight, 0.1 );
-   pigeon =  new Pigeon2(0);
-   pigeon.reset();
+    pigeon = new Pigeon2(0);
+    pigeon.reset();
     ballGrabber = new Ballgrabber(5,6,7 );
     intakeSwitch = false;
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     compressor.enableDigital();
-    
+    autoChooser.setDefaultOption("Auto1", kDefaultAuto);
+    autoChooser.addOption("Auto2", kCustomAuto);
+    SmartDashboard.putData("Auto choices", autoChooser);
 
 
 }
@@ -59,7 +66,13 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {}
 
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    
+    autoSelected = autoChooser.getSelected();
+    System.out.println("Auto selected: " + autoSelected);
+
+
+  }
 
   @Override
   public void autonomousPeriodic() {}
@@ -92,8 +105,15 @@ public class Robot extends TimedRobot {
      if (intakeSwitch){
       ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
      }
-      //else {ballGrabber.stopGrabber();
-      //}
+     if (stick.getRawButton(4)){
+
+      ballGrabber.pneumaticsExtend();
+     }
+    
+    if (stick.getRawButton(6)){
+
+     ballGrabber.pneumaticsRetract();
+    }
   }
 
   public double speedFix(double oldSpeed)  {
