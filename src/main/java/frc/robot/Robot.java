@@ -48,7 +48,6 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
   private Timer timer;
   private boolean autoEnd;
-<<<<<<< HEAD
   public SparkMax angleMotor;
   public SparkFlex motor;
 
@@ -73,21 +72,6 @@ public class Robot extends TimedRobot {
 
 
   
-=======
-  private AutoBuilder auto;
-  public Robot() {
-  frontLeft = new TalonFX(4);
-  frontRight = new TalonFX(3);
-  backLeft = new TalonFX(1);
-  backRight = new TalonFX(2);
-  stick = new Joystick(1);
-  gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
-  drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro,0.1 );
-  ballGrabber = new Ballgrabber(5);
-  intakeSwitch = false;
-  timer = new Timer();
-  auto = new AutoBuilder();
->>>>>>> f7fa368 (2/25/2025)
 }
 
   @Override
@@ -95,12 +79,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-<<<<<<< HEAD
     timer.start();
-=======
- 
-  }
->>>>>>> f7fa368 (2/25/2025)
     
 
 
@@ -112,23 +91,8 @@ public class Robot extends TimedRobot {
 
     autoSelected = autoChooser.getSelected();
     System.out.println("Auto selected: " + autoSelected);
- 
-    
-    if (!autoEnd){
-    
-      if(timer.get() < 5){
-      drivetrain.arcadeDrive(0.5, -stick.getY(), 0.5*stick.getZ());
-
-    
-    /*if (!autoEnd){
-      timer.start();
-      }
-      
-      
-    }
-
-
-  }
+    drivetrain.timedDrive(5, timer, 0, 0.25, 0);
+}
 
   @Override
   public void teleopInit() {}

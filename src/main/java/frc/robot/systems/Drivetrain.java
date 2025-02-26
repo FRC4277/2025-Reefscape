@@ -3,6 +3,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -30,7 +31,8 @@ public class Drivetrain {
     DutyCycleOut dutycyclebr;
     double dtDeadband;
     AHRS gyro;
-    Timer timer;
+    boolean first;
+    double startTime;
     public Drivetrain(TalonFX frontLeft,TalonFX frontRight,TalonFX backLeft,TalonFX backRight, AHRS passedGyro, double deadband){
         dtFrontLeft = frontLeft;
         dtFrontRight = frontRight;
@@ -52,30 +54,27 @@ public class Drivetrain {
         backLeftConfigurator = dtBackLeft.getConfigurator();
         backRightConfigurator = dtBackRight.getConfigurator();
         gyro = passedGyro;
-        timer = new Timer();
         frontLeftConfigurator.apply(leftConfig);
         frontRightConfigurator.apply(rightConfig);
         backLeftConfigurator.apply(leftConfig);
         backRightConfigurator.apply(rightConfig);
-        
+        first = true;
     } 
 
-   public void timedDrive(double time, double xSpeed, double ySpeed, double zSpeed){
-
+   public void timedDrive(double time,Timer timer, double xSpeed, double ySpeed, double zSpeed){
+    if(first==true){
+        first = false;
+        startTime = timer.get();
+     }
     
-        if(timer.get() < 5){
-        arcadeDrive(0.5, ySpeed, 0.5*xSpeed);
+        if(timer.get() < 5 + startTime){
+        arcadeDrive(xSpeed, ySpeed,0.5*zSpeed);
         }
         
-        else{
+        else if(timer.get()> 5 + startTime){
         stop();
+        first = true;
         }
-    
-    fieldOrientedDrive(xSpeed,ySpeed,zSpeed);
-    
-    
-
-    stop();
    }
    
    
