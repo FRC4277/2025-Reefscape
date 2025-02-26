@@ -48,6 +48,7 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
   private Timer timer;
   private boolean autoEnd;
+<<<<<<< HEAD
   public SparkMax angleMotor;
   public SparkFlex motor;
 
@@ -72,6 +73,21 @@ public class Robot extends TimedRobot {
 
 
   
+=======
+  private AutoBuilder auto;
+  public Robot() {
+  frontLeft = new TalonFX(4);
+  frontRight = new TalonFX(3);
+  backLeft = new TalonFX(1);
+  backRight = new TalonFX(2);
+  stick = new Joystick(1);
+  gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+  drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro,0.1 );
+  ballGrabber = new Ballgrabber(5);
+  intakeSwitch = false;
+  timer = new Timer();
+  auto = new AutoBuilder();
+>>>>>>> f7fa368 (2/25/2025)
 }
 
   @Override
@@ -79,7 +95,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+<<<<<<< HEAD
     timer.start();
+=======
+ 
+  }
+>>>>>>> f7fa368 (2/25/2025)
     
 
 
