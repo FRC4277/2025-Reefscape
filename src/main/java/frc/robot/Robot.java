@@ -17,6 +17,10 @@ import frc.robot.systems.Drivetrain;
 import com.studica.frc.AHRS;
 import frc.robot.systems.Ballgrabber;
 import edu.wpi.first.wpilibj.Timer;
+
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -36,11 +40,14 @@ public class Robot extends TimedRobot {
   private Ballgrabber ballGrabber;
   private AHRS gyro;
   private boolean intakeSwitch;
-  private final Compressor compressor;
   private static final String kDefaultAuto = "Auto1";
   private static final String kCustomAuto = "Auto2";
   private String autoSelected;
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
+  private Timer timer;
+  private boolean autoEnd;
+  public SparkMax angleMotor;
+  public SparkFlex motor;
 
   public Robot() {
     frontLeft = new TalonFX(4);
@@ -48,20 +55,21 @@ public class Robot extends TimedRobot {
     backLeft = new TalonFX(1);
     backRight = new TalonFX(2);
     stick = new Joystick(1);
-    ballGrabber = new Ballgrabber(5);//,6,7
+    gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro, 0.1 );
+   
+    motor = new SparkFlex(5, MotorType.kBrushless);
+    angleMotor = new SparkMax(6, MotorType.kBrushless);
+    ballGrabber = new Ballgrabber(motor, angleMotor);
+  
     intakeSwitch = false;
-    compressor = new Compressor(PneumaticsModuleType.REVPH);
-    compressor.enableDigital();
+    timer = new Timer();
     autoChooser.setDefaultOption("Auto1", kDefaultAuto);
     autoChooser.addOption("Auto2", kCustomAuto);
     SmartDashboard.putData("Auto choices", autoChooser);
 
 
-  private Timer timer;
-  private boolean autoEnd;
-  gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
-  drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro,0.1 );
-  timer = new Timer();
+  
 }
 
   @Override
@@ -69,7 +77,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    
+    timer.start();
     
 
 
@@ -80,6 +88,23 @@ public class Robot extends TimedRobot {
 
     autoSelected = autoChooser.getSelected();
     System.out.println("Auto selected: " + autoSelected);
+    autoEnd = false;
+ 
+    
+    if (!autoEnd){
+    
+      if(timer.get() < 5){
+      drivetrain.arcadeDrive(0.5, -stick.getY(), 0.5*stick.getZ());
+        
+      }
+      else{
+        drivetrain.stop();
+      }
+      
+      
+    }
+
+
   }
 
   @Override

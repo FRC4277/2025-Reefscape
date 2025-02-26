@@ -5,7 +5,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import java.util.Arrays;
 import java.util.List;
-
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
 
@@ -62,7 +61,15 @@ public class Drivetrain {
     } 
 
    public void timedDrive(double time, double xSpeed, double ySpeed, double zSpeed){
+
+    
+        if(timer.get() < 5){
+        arcadeDrive(0.5, ySpeed, 0.5*xSpeed);
+        }
         
+        else{
+        stop();
+        }
     
     fieldOrientedDrive(xSpeed,ySpeed,zSpeed);
     
@@ -107,7 +114,7 @@ public class Drivetrain {
         dtFrontRight.set(wheelSpeeds.get(1));
         dtBackLeft.set(wheelSpeeds.get(2));
         dtBackRight.set(wheelSpeeds.get(3));
-        
+        //System.out.println(xSpeed + " " + ySpeed + " " + zSpeed);
     }
 
     private List<Double> getWheelSpeeds(double xSpeed, double ySpeed, double zSpeed, double angleRad){
