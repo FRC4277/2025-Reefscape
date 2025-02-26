@@ -2,7 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+
 package frc.robot;
+
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -86,19 +88,19 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
+
     autoSelected = autoChooser.getSelected();
     System.out.println("Auto selected: " + autoSelected);
-    autoEnd = false;
  
     
     if (!autoEnd){
     
       if(timer.get() < 5){
       drivetrain.arcadeDrive(0.5, -stick.getY(), 0.5*stick.getZ());
-        
-      }
-      else{
-        drivetrain.stop();
+
+    
+    /*if (!autoEnd){
+      timer.start();
       }
       
       
