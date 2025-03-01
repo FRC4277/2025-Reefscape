@@ -10,9 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import frc.robot.systems.Drivetrain;
 import com.studica.frc.AHRS;
 import frc.robot.systems.Ballgrabber;
@@ -21,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
  * the TimedRobot documentation. If you change the name of this class or the package after creating
@@ -48,6 +48,8 @@ public class Robot extends TimedRobot {
   private boolean autoEnd;
   public SparkMax angleMotor;
   public SparkFlex motor;
+  public DigitalInput stopperTop;
+  public DigitalInput stopperBottom;
 
   public Robot() {
     frontLeft = new TalonFX(4);
@@ -60,8 +62,13 @@ public class Robot extends TimedRobot {
    
     motor = new SparkFlex(5, MotorType.kBrushless);
     angleMotor = new SparkMax(6, MotorType.kBrushless);
-    ballGrabber = new Ballgrabber(motor, angleMotor);
+    stopperTop = new DigitalInput(0);
+    stopperBottom = new DigitalInput(0);
+    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom);
   
+    
+    
+    //mogus
     intakeSwitch = false;
     timer = new Timer();
     autoChooser.setDefaultOption("Auto1", kDefaultAuto);
@@ -100,11 +107,7 @@ public class Robot extends TimedRobot {
       else{
         drivetrain.stop();
       }
-      
-      
     }
-
-
   }
 
   @Override
@@ -112,8 +115,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
-    //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
+    
+    //drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
+    
+    drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
+    
+    
     if (stick.getTriggerPressed() == true){
       drivetrain.resetGyro();
     }
@@ -121,31 +128,36 @@ public class Robot extends TimedRobot {
      if (stick.getRawButtonPressed(5)){
         intakeSwitch = true;
      }
-     if (stick.getRawButtonPressed(3)){
+     else if (stick.getRawButtonPressed(3)){
       ballGrabber.stopGrabber();
       intakeSwitch = false;
      }
 
 
-     if (stick.getRawButton(2)){
+     if (stick.getRawButton(2)) {
      double fixedSpeed = speedFix(stick.getRawAxis(3));
+
       ballGrabber.startGrabber(-fixedSpeed);
-     } 
+    }
+
      if (intakeSwitch){
       ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
      }
-
-   /*   
-   if (stick.getRawButton(4)){
-
-      ballGrabber.pneumaticsExtend();
-     }
     
-    if (stick.getRawButton(6)){
-
-     ballGrabber.pneumaticsRetract();
+    if (stick.getRawButton(8)){
+      if (stopperTop.get()){
+        ballGrabber.stopAngleChange();
+      }
     }
- */ }
+      else ballGrabber.angleChangePos();
+    
+    if(stick.getRawButton(9))
+      if (stopperTop.get()){
+        ballGrabber.stopAngleChange();}
+
+       else ballGrabber.angleChangeNeg();
+  }
+    
 
   public double speedFix(double oldSpeed)  {
     double speedNew = (oldSpeed + 1) / 2;
@@ -154,7 +166,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {}
-//mogus
+
   @Override
   public void disabledPeriodic() {}
 

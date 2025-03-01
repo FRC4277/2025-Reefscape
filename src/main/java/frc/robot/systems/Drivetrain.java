@@ -66,7 +66,7 @@ public class Drivetrain {
         if(timer.get() < 5){
         arcadeDrive(0.5, ySpeed, 0.5*xSpeed);
         }
-        
+     //mogus   
         else{
         stop();
         }
@@ -156,7 +156,6 @@ public class Drivetrain {
         }
         
     
-    //mogus
     }
 
 }
