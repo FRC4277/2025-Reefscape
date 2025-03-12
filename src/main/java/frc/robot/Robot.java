@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import frc.robot.systems.Drivetrain;
 import com.studica.frc.AHRS;
 import frc.robot.systems.Ballgrabber;
@@ -42,10 +40,12 @@ public class Robot extends TimedRobot {
   private Ballgrabber ballGrabber;
   private AHRS gyro;
   private boolean intakeSwitch;
-  private static final String kDefaultAuto = "Auto1";
-  private static final String kCustomAuto = "Auto2";
-  private String autoSelected;
-  private final SendableChooser<String> autoChooser = new SendableChooser<>();
+  private static final String AutoLeft = "AutoLeft";
+  private static final String AutoCenter = "AutoCenter";
+  private static final String AutoRight = "AutoRight";
+  private static final String noneSelected = "Default";
+  private String m_autoSelected;
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();  
   private Timer timer;
   private boolean autoEnd;
   public SparkMax angleMotor;
@@ -66,8 +66,10 @@ public class Robot extends TimedRobot {
   
     intakeSwitch = false;
     timer = new Timer();
-    autoChooser.setDefaultOption("Auto1", kDefaultAuto);
-    autoChooser.addOption("Auto2", kCustomAuto);
+    autoChooser.setDefaultOption("Default", noneSelected);
+    autoChooser.addOption("AutoLeft", AutoLeft);
+    autoChooser.addOption("AutoCenter", AutoCenter);
+    autoChooser.addOption("AutoRight", AutoRight);
     SmartDashboard.putData("Auto choices", autoChooser);
 
 
@@ -80,18 +82,44 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     timer.start();
-    
-
+    drivetrain.resetGyro();
+    m_autoSelected = autoChooser.getSelected();
+    System.out.println("Auto selected: " + m_autoSelected);
 
   }
 
   @Override
   public void autonomousPeriodic() {
+      /** This function is called periodically during autonomous. */
+  
+    switch (m_autoSelected) {
+      case AutoLeft:
+        // Put custom auto code here
+        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        break;
+        case AutoCenter:
+        // Put custom auto code here
+        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        break;
+        case AutoRight:
+        // Put custom auto code here
+        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        break;
+        
+      case noneSelected:
+      default:
+        // Put default auto code here
+        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        break;
+    }
+  
 
-
-    autoSelected = autoChooser.getSelected();
-    System.out.println("Auto selected: " + autoSelected);
-    drivetrain.timedDrive(5, timer, 0, 0.25, 0);
+    
+    drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+    timer.delay(1);
+    drivetrain.turnToRotation(45,10);
+    drivetrain.timedDrive(15, timer, 0.25, 0, 0);
+    
 }
 
   @Override

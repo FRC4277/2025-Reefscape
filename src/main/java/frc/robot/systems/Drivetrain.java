@@ -61,22 +61,44 @@ public class Drivetrain {
         first = true;
     } 
 
-   public void timedDrive(double time,Timer timer, double xSpeed, double ySpeed, double zSpeed){
-    if(first==true){
-        first = false;
-        startTime = timer.get();
-     }
-    
-        if(timer.get() < 5 + startTime){
-        arcadeDrive(xSpeed, ySpeed,0.5*zSpeed);
-        }
+    public void autonomousTest(){
         
-        else if(timer.get()> 5 + startTime){
-        stop();
-        first = true;
-        }
-   }
+
+    }
    
+   
+    public void timedDrive(double time,Timer timer, double xSpeed, double ySpeed, double zSpeed){
+    
+        
+        arcadeDrive(xSpeed, ySpeed,0.5*zSpeed);
+        timer.delay(time);
+        stop();
+   }
+   public void turnToRotation(double desiredAngle, double deadZone){
+        
+    
+        if (gyro.getAngle() < desiredAngle){
+           while (gyro.getAngle() < desiredAngle){
+            if (Math.abs(gyro.getAngle() - desiredAngle) < deadZone){
+                break;
+            }
+            arcadeDrive(0, 0, 0.25);
+           } 
+            
+
+            }
+        else if (gyro.getAngle() > desiredAngle){
+            while (gyro.getAngle() > desiredAngle){
+                if (Math.abs(gyro.getAngle() - desiredAngle) < deadZone){
+                    break;
+                }
+                arcadeDrive(0, 0, -0.25);
+        }    
+    }
+        stop();
+        
+    }
+
    
     public void fieldOrientedDrive(double xSpeed, double ySpeed, double zSpeed){
         List<Double> wheelSpeeds = getWheelSpeeds(xSpeed, ySpeed, zSpeed, Math.toRadians(gyro.getAngle()));
