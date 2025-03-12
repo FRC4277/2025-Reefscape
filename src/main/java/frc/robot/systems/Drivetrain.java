@@ -177,7 +177,6 @@ public class Drivetrain {
         }
         
     
-    //mogus
     }
 
 }
