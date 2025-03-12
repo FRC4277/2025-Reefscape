@@ -1,8 +1,12 @@
 package frc.robot.systems;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 
 
@@ -12,13 +16,26 @@ public class Ballgrabber {
     SparkMax angleMotor;
     SparkFlexConfig config;
     double speedFix;
-    DigitalInput input;
+    DigitalInput stopperTop;
+    DigitalInput stopperBottom;
+
     public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom){
         
-        
-        config = new SparkFlexConfig();
+        this.angleMotor = angleMotor;
+        this.motor = motor;
+        this.stopperTop = stopperTop;
+        this.stopperBottom = stopperBottom;
+
+        SparkFlexConfig config = new SparkFlexConfig();
         config.idleMode(IdleMode.kCoast);
         config.inverted(true);
+
+        SparkMaxConfig config2 = new SparkMaxConfig();
+        config2.idleMode(IdleMode.kCoast);
+        config2.inverted(true);
+        
+        this.motor.configure(config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters );
+        this.angleMotor.configure(config2,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters );
 
     }
 
@@ -30,25 +47,28 @@ public class Ballgrabber {
         motor.set(0);
     }
 
-    public void angleChangePos(){
-        angleMotor.set(.05);
-
+    public boolean angleChangePos(){
+        if (stopperTop.get()){
+            angleMotor.set(.2);
+            return true;
+        }
+        stopAngleChange();
+        return false;
     }
 
-    public void angleChangeNeg(){
-        angleMotor.set(-.05);
-
+    public boolean angleChangeNeg(){
+        if (stopperBottom.get()){
+            angleMotor.set(-.2);
+            return true;
+        }
+        stopAngleChange();
+        return false;
     }
     public void stopAngleChange(){
     angleMotor.stopMotor();
 
 
    }
-    public void switchstop(){
-     angleMotor.stopMotor();
-       
-
-    }
    
     
 }
