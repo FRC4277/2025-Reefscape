@@ -14,14 +14,25 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
-import frc.robot.systems.Drivetrain;
+import edu.wpi.first.wpilibj.XboxController;
+
 import com.studica.frc.AHRS;
-import frc.robot.systems.Ballgrabber;
+
 import edu.wpi.first.wpilibj.Timer;
+import  edu.wpi.first.wpilibj.Relay;
+
+import frc.robot.systems.Drivetrain;
+import frc.robot.systems.Ballgrabber;
+import frc.robot.systems.Corallauncher;
+import frc.robot.systems.autonomousRoutines;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.TimedRobot;
+
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -33,18 +44,25 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  Thread m_visionThread;
   private TalonFX frontLeft;
   private TalonFX frontRight;
   private TalonFX backLeft;
   private TalonFX backRight;
   private Joystick stick;
+  private XboxController controller;
   private Drivetrain drivetrain;
   private Ballgrabber ballGrabber;
   private AHRS gyro;
+  private Corallauncher coralLauncher;
   private boolean intakeSwitch;
   private boolean outtakeSwitch;
   private boolean armUpSwitch;
   private boolean armDownSwitch;
+  private boolean coralIntake;
+  private boolean coralLaunch;
+  private autonomousRoutines autonomous;
+  private Relay relay;
   private static final String AutoLeft = "AutoLeft";
   private static final String AutoCenter = "AutoCenter";
   private static final String AutoRight = "AutoRight";
@@ -56,31 +74,44 @@ public class Robot extends TimedRobot {
   private boolean autoEnd;
   public SparkMax angleMotor;
   public SparkFlex motor;
+  public SparkFlex launcher;
   public DigitalInput stopperTop;
   public DigitalInput stopperBottom;
+  public DigitalInput stopGrabber;
  
   public Robot() {
+    
     frontLeft = new TalonFX(4);
     frontRight = new TalonFX(3);
     backLeft = new TalonFX(1);
     backRight = new TalonFX(2);
     stick = new Joystick(1);
+    controller = new XboxController(0);
+    launcher = new SparkFlex(7,MotorType.kBrushless);
     gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
     drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro, 0.1 );
-
+    relay = new Relay(0); 
     motor = new SparkFlex(5, MotorType.kBrushless);
     angleMotor = new SparkMax(6, MotorType.kBrushless);
-   
+    
+
+  
     stopperTop = new DigitalInput(0);
     stopperBottom = new DigitalInput(1);
-    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom);
-  
+    stopGrabber = new DigitalInput(2);
+    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom,relay);
+    coralLauncher = new Corallauncher(launcher,stopGrabber);
+    timer = new Timer();
+
+    autonomous = new autonomousRoutines(drivetrain,ballGrabber,coralLauncher,timer);
+    coralIntake = false;
+    coralLaunch = false;
     intakeSwitch = false;
     outtakeSwitch = false;
     armUpSwitch = false;
     armDownSwitch = false;
 
-    timer = new Timer();
+    
     autoChooser.setDefaultOption("Default", noneSelected);
     autoChooser.addOption("AutoLeft", AutoLeft);
     autoChooser.addOption("AutoCenter", AutoCenter);
@@ -90,8 +121,13 @@ public class Robot extends TimedRobot {
 
   
 }
-
-  @Override
+@Override
+  public void robotInit() {
+    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture();
+  }
+  
+@Override
   public void robotPeriodic() {}
 
   @Override
@@ -100,7 +136,7 @@ public class Robot extends TimedRobot {
     drivetrain.resetGyro();
     m_autoSelected = autoChooser.getSelected();
     System.out.println("Auto selected: " + m_autoSelected);
-
+    drivetrain.motorBrakeMode();
   }
 
   @Override
@@ -110,36 +146,35 @@ public class Robot extends TimedRobot {
     switch (m_autoSelected) {
       case AutoLeft:
         // Put custom auto code here
-        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        autonomous.positionLeft();
         break;
         case AutoCenter:
         // Put custom auto code here
-        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+       autonomous.positionMiddle();
         break;
         case AutoRight:
         // Put custom auto code here
-        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+       autonomous.positionRight();
         break;
         
       case noneSelected:
       default:
         // Put default auto code here
-        drivetrain.timedDrive(15, timer, 0, 0.25, 0);
+        
         break;
     }
   
 
     
-    drivetrain.timedDrive(15, timer, 0, 0.25, 0);
-    timer.delay(1);
-    drivetrain.turnToRotation(45,10);
-    drivetrain.timedDrive(15, timer, 0.25, 0, 0);
+
     
 }
 
   @Override
-  public void teleopInit() {}
-
+  public void teleopInit() {
+    drivetrain.motorCoastMode();
+  }
+  
   @Override
   public void teleopPeriodic() {
     
@@ -152,29 +187,39 @@ public class Robot extends TimedRobot {
       drivetrain.resetGyro();
     }
 
-     if (stick.getRawButtonPressed(5)){
+     if (controller.getAButtonPressed() == true){
         intakeSwitch = true;
      }
-     if (stick.getRawButtonPressed(12)){
+     if (controller.getXButtonPressed() == true){
       outtakeSwitch = true;
      }
-     else if (stick.getRawButtonPressed(3)){
+     else if (controller.getBButtonPressed() == true){
       ballGrabber.stopGrabber();
       intakeSwitch = false;
       outtakeSwitch = false;
+      coralIntake = false;
+      coralLaunch = false;
+      coralLauncher.stopLauncher();
      }
 
-     if (stick.getRawButtonPressed(4)){
+     if (controller.getLeftBumperButtonPressed() == true){
       armUpSwitch = true;
       armDownSwitch = false;
     }
       
     
-    if (stick.getRawButtonPressed(6)){
+    if (controller. getRightBumperButtonPressed() == true){
       armDownSwitch = true;
       armUpSwitch = false;
     }
+    if (controller.getYButtonPressed() == true){
+      coralLauncher.intakeCoral(0.1);
+    }
 
+
+    if (controller.get){
+      coralLauncher.launchCoral(0.3);
+    }
 
      /*if (stick.getRawButton(2)) {
      double fixedSpeed = speedFix(stick.getRawAxis(3));
@@ -183,10 +228,10 @@ public class Robot extends TimedRobot {
     }*/
 
      if (intakeSwitch){
-      ballGrabber.startGrabber(speedFix(stick.getRawAxis(3)));
+      ballGrabber.startGrabber(0.3);
      }
      if (outtakeSwitch){
-      ballGrabber.startGrabber(-speedFix(stick.getRawAxis(3)));
+      ballGrabber.startGrabber(-0.3);
      }
      
      if (armUpSwitch){
@@ -200,7 +245,15 @@ public class Robot extends TimedRobot {
       if(!ballGrabber.angleChangeNeg()){
         armDownSwitch = false;
       }
-     }
+    if (coralIntake){
+      coralLaunch = false;
+      coralLauncher.intakeCoral(0.3);
+    }
+    if (coralLaunch){
+      coralIntake = false;
+      coralLauncher.launchCoral(0.3);
+    }
+    }
     
 
   }

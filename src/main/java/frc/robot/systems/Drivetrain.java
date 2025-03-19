@@ -29,6 +29,8 @@ public class Drivetrain {
     DutyCycleOut dutycyclefr;
     DutyCycleOut dutycyclebl;
     DutyCycleOut dutycyclebr;
+    boolean coastmodemode;
+    
     double dtDeadband;
     AHRS gyro;
     boolean first;
@@ -59,6 +61,7 @@ public class Drivetrain {
         backLeftConfigurator.apply(leftConfig);
         backRightConfigurator.apply(rightConfig);
         first = true;
+        
     } 
 
     public void autonomousTest(){
@@ -82,7 +85,7 @@ public class Drivetrain {
             if (Math.abs(gyro.getAngle() - desiredAngle) < deadZone){
                 break;
             }
-            arcadeDrive(0, 0, 0.25);
+            arcadeDrive(0, 0, 0.5);
            } 
             
 
@@ -124,7 +127,7 @@ public class Drivetrain {
     }
 
     public void resetGyro(){
-        gyro.reset();
+    gyro.reset();
 
     }
 
@@ -179,4 +182,21 @@ public class Drivetrain {
     
     }
 
+    public void motorBrakeMode(){
+        leftConfig.NeutralMode = NeutralModeValue.Brake;
+        rightConfig.NeutralMode = NeutralModeValue.Brake; 
+        frontLeftConfigurator.apply(leftConfig);
+        frontRightConfigurator.apply(rightConfig);
+        backLeftConfigurator.apply(leftConfig);
+        backRightConfigurator.apply(rightConfig);
+    }
+    public void motorCoastMode(){
+        leftConfig.NeutralMode = NeutralModeValue.Coast;
+        rightConfig.NeutralMode = NeutralModeValue.Coast;
+        frontLeftConfigurator.apply(leftConfig);
+        frontRightConfigurator.apply(rightConfig);
+        backLeftConfigurator.apply(leftConfig);
+        backRightConfigurator.apply(rightConfig);
+
+    }
 }

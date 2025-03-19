@@ -6,7 +6,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 
@@ -18,14 +19,14 @@ public class Ballgrabber {
     double speedFix;
     DigitalInput stopperTop;
     DigitalInput stopperBottom;
-
-    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom){
+    Relay relay;
+    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom, Relay relay){
         
         this.angleMotor = angleMotor;
         this.motor = motor;
         this.stopperTop = stopperTop;
         this.stopperBottom = stopperBottom;
-
+        this.relay = relay;
         SparkFlexConfig config = new SparkFlexConfig();
         config.idleMode(IdleMode.kCoast);
         config.inverted(true);
@@ -36,11 +37,12 @@ public class Ballgrabber {
         
         this.motor.configure(config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters );
         this.angleMotor.configure(config2,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters );
-
+        magneton();
     }
 
     public void startGrabber(double setSpeed){
         motor.set(setSpeed);
+        
     }
 
     public void stopGrabber(){
@@ -48,7 +50,9 @@ public class Ballgrabber {
     }
 
     public boolean angleChangePos(){
+        magneton();
         if (stopperTop.get()){
+            
             angleMotor.set(.2);
             return true;
         }
@@ -57,6 +61,7 @@ public class Ballgrabber {
     }
 
     public boolean angleChangeNeg(){
+        magnetoff();
         if (stopperBottom.get()){
             angleMotor.set(-.2);
             return true;
@@ -69,6 +74,11 @@ public class Ballgrabber {
 
 
    }
-   
+   public void magneton(){
+    relay.set(Value.kOn);
+   }
+   public void magnetoff(){
+    relay.set(Value.kOff);
     
+}
 }
