@@ -61,6 +61,7 @@ public class Robot extends TimedRobot {
   private boolean armDownSwitch;
   private boolean coralIntake;
   private boolean coralLaunch;
+  private boolean autoIntakeSwitch;
   private autonomousRoutines autonomous;
   private Relay relay;
   private static final String AutoLeft = "AutoLeft";
@@ -78,6 +79,7 @@ public class Robot extends TimedRobot {
   public DigitalInput stopperTop;
   public DigitalInput stopperBottom;
   public DigitalInput stopGrabber;
+  public DigitalInput stopGrab;
  
   public Robot() {
     
@@ -98,8 +100,9 @@ public class Robot extends TimedRobot {
   
     stopperTop = new DigitalInput(0);
     stopperBottom = new DigitalInput(1);
-    stopGrabber = new DigitalInput(2);
-    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom,relay);
+    stopGrabber = new DigitalInput(3);
+    stopGrab = new DigitalInput(2);
+    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom,stopGrab,relay);
     coralLauncher = new Corallauncher(launcher,stopGrabber);
     timer = new Timer();
 
@@ -110,7 +113,7 @@ public class Robot extends TimedRobot {
     outtakeSwitch = false;
     armUpSwitch = false;
     armDownSwitch = false;
-
+    autoIntakeSwitch = false;
     
     autoChooser.setDefaultOption("Default", noneSelected);
     autoChooser.addOption("AutoLeft", AutoLeft);
@@ -200,19 +203,22 @@ public class Robot extends TimedRobot {
       coralLauncher.stopLauncher();
      }
      if (controller.getAButtonPressed() == true){
-      intakeSwitch = true;
+      autoIntakeSwitch = true;
+      intakeSwitch = false;
       outtakeSwitch = false;
-      armDownSwitch = true;
-      armUpSwitch = false;
+      coralIntake = false;
+      coralLaunch = false;
      }
      else if (controller.getYButtonPressed() == true){
       intakeSwitch = false;
       outtakeSwitch = false;
       armDownSwitch = false;
+      autoIntakeSwitch = false;
       armUpSwitch = true;
      }
      if (controller.getXButtonPressed() == true){
       intakeSwitch = false;
+      autoIntakeSwitch = false;
       outtakeSwitch = true;
       timer.delay(2);
       outtakeSwitch = false;
@@ -270,6 +276,12 @@ public class Robot extends TimedRobot {
     if (coralLaunch){
       coralIntake = false;
       coralLauncher.launchCoral(0.3);
+    }
+    if (autoIntakeSwitch){
+      if(ballGrabber.autoGrab(0.3)){
+        autoIntakeSwitch = false;
+      }
+      
     }
     }
     

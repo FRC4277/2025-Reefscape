@@ -19,14 +19,16 @@ public class Ballgrabber {
     double speedFix;
     DigitalInput stopperTop;
     DigitalInput stopperBottom;
+    DigitalInput grabStop;
     Relay relay;
-    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom, Relay relay){
+    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom,DigitalInput grabStop, Relay relay){
         
         this.angleMotor = angleMotor;
         this.motor = motor;
         this.stopperTop = stopperTop;
         this.stopperBottom = stopperBottom;
         this.relay = relay;
+        this.grabStop = grabStop;
         SparkFlexConfig config = new SparkFlexConfig();
         config.idleMode(IdleMode.kCoast);
         config.inverted(true);
@@ -41,7 +43,9 @@ public class Ballgrabber {
     }
 
     public void startGrabber(double setSpeed){
-        motor.set(setSpeed);
+        while (grabStop.get() == false){
+            motor.set(setSpeed);
+        } 
         
     }
 
@@ -81,4 +85,17 @@ public class Ballgrabber {
     relay.set(Value.kOff);
     
 }
+    public boolean autoGrab(double setSpeed){
+        angleChangeNeg();
+        if(grabStop.get() == false){
+            startGrabber(setSpeed);
+            return false;
+        }
+        else if (grabStop.get() == true){
+            stopGrabber();
+            angleChangePos();
+            return true;
+        }
+        return true;
+        }
 }
