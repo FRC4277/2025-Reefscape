@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
     backLeft = new TalonFX(1);
     backRight = new TalonFX(2);
     stick = new Joystick(1);
-    controller = new XboxController(0);
+    controller = new XboxController(2);
     launcher = new SparkFlex(7,MotorType.kBrushless);
     gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
     drivetrain = new Drivetrain(frontLeft, frontRight, backLeft, backRight,gyro, 0.1 );
@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
   
   @Override
   public void teleopPeriodic() {
-    
+    System.out.println("Button Pressed" + controller.getPOV());
     drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
     
     //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
@@ -216,8 +216,8 @@ public class Robot extends TimedRobot {
       coralLauncher.intakeCoral(0.1);
     }
 
-
-    if (controller.get){
+    
+    /*if (controller.getPOV() == true){
       coralLauncher.launchCoral(0.3);
     }
 
