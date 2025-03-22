@@ -177,9 +177,7 @@ public class Robot extends TimedRobot {
   
   @Override
   public void teleopPeriodic() {
-    System.out.println("Button Pressed" + controller.getPOV());
     drivetrain.fieldOrientedDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
-    
     //drivetrain.arcadeDrive(stick.getX(), -stick.getY(), 0.5*stick.getZ());
     
     
@@ -187,13 +185,13 @@ public class Robot extends TimedRobot {
       drivetrain.resetGyro();
     }
 
-     if (controller.getAButtonPressed() == true){
+     if (controller.getPOV() == 270){
         intakeSwitch = true;
      }
-     if (controller.getXButtonPressed() == true){
+     if (controller.getPOV() == 45){
       outtakeSwitch = true;
      }
-     else if (controller.getBButtonPressed() == true){
+     else if (controller.getLeftStickButtonPressed() == true){
       ballGrabber.stopGrabber();
       intakeSwitch = false;
       outtakeSwitch = false;
@@ -201,23 +199,43 @@ public class Robot extends TimedRobot {
       coralLaunch = false;
       coralLauncher.stopLauncher();
      }
-
-     if (controller.getLeftBumperButtonPressed() == true){
+     if (controller.getAButtonPressed() == true){
+      intakeSwitch = true;
+      outtakeSwitch = false;
+      armDownSwitch = true;
+      armUpSwitch = false;
+     }
+     else if (controller.getYButtonPressed() == true){
+      intakeSwitch = false;
+      outtakeSwitch = false;
+      armDownSwitch = false;
+      armUpSwitch = true;
+     }
+     if (controller.getXButtonPressed() == true){
+      intakeSwitch = false;
+      outtakeSwitch = true;
+      timer.delay(2);
+      outtakeSwitch = false;
+     }
+     if (controller.getPOV() == 0){
       armUpSwitch = true;
       armDownSwitch = false;
     }
       
     
-    if (controller. getRightBumperButtonPressed() == true){
+    if (controller.getPOV() == 180){
       armDownSwitch = true;
       armUpSwitch = false;
     }
-    if (controller.getYButtonPressed() == true){
-      coralLauncher.intakeCoral(0.1);
+    if (controller.getPOV() == 270){
+      outtakeSwitch = false;
+      intakeSwitch = true;
     }
-
+    if (controller.getLeftBumperButtonPressed() == true){
+      coralLauncher.intakeCoral(0.3);
+    }
     
-    /*if (controller.getPOV() == true){
+    if (controller.getRightBumperButtonPressed() == true){
       coralLauncher.launchCoral(0.3);
     }
 
