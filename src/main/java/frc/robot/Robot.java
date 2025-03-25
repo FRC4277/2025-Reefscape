@@ -204,10 +204,10 @@ public class Robot extends TimedRobot {
      }
      if (controller.getAButtonPressed() == true){
       autoIntakeSwitch = true;
-      intakeSwitch = false;
+      /*intakeSwitch = false;
       outtakeSwitch = false;
       coralIntake = false;
-      coralLaunch = false;
+      coralLaunch = false;*/
      }
      else if (controller.getYButtonPressed() == true){
       intakeSwitch = false;
