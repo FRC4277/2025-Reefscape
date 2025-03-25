@@ -216,34 +216,34 @@ public class Robot extends TimedRobot {
       autoIntakeSwitch = false;
       armUpSwitch = true;
      }
-     if (controller.getXButtonPressed() == true){
+     else if (controller.getXButtonPressed() == true){
       intakeSwitch = false;
       autoIntakeSwitch = false;
       outtakeSwitch = true;
       timer.delay(2);
       outtakeSwitch = false;
      }
-     if (controller.getPOV() == 0){
+     else if (controller.getPOV() == 0){
       armUpSwitch = true;
       armDownSwitch = false;
     }
       
-    
-    if (controller.getPOV() == 180){
+    else if (controller.getPOV() == 180){
       armDownSwitch = true;
       armUpSwitch = false;
     }
-    if (controller.getPOV() == 270){
+    else if (controller.getPOV() == 270){
       outtakeSwitch = false;
       intakeSwitch = true;
     }
-    if (controller.getLeftBumperButtonPressed() == true){
+    else if (controller.getLeftBumperButtonPressed() == true){
       coralLauncher.intakeCoral(0.3);
     }
     
-    if (controller.getRightBumperButtonPressed() == true){
+    else if (controller.getRightBumperButtonPressed() == true){
       coralLauncher.launchCoral(0.3);
     }
+
 
      /*if (stick.getRawButton(2)) {
      double fixedSpeed = speedFix(stick.getRawAxis(3));
@@ -269,6 +269,7 @@ public class Robot extends TimedRobot {
       if(!ballGrabber.angleChangeNeg()){
         armDownSwitch = false;
       }
+    }
     if (coralIntake){
       coralLaunch = false;
       coralLauncher.intakeCoral(0.3);
@@ -277,16 +278,14 @@ public class Robot extends TimedRobot {
       coralIntake = false;
       coralLauncher.launchCoral(0.3);
     }
-    if (autoIntakeSwitch){
+    if (autoIntakeSwitch == true){
+      System.out.println("here");
       if(ballGrabber.autoGrab(0.3)){
         autoIntakeSwitch = false;
       }
       
     }
-    }
-    
-
-  }
+ }
     
 
   public double speedFix(double oldSpeed)  {

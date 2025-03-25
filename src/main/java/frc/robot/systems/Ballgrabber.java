@@ -96,6 +96,6 @@ public class Ballgrabber {
             angleChangePos();
             return true;
         }
-        return true;
+        return false;
         }
 }
