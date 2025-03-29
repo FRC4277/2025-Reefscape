@@ -27,12 +27,15 @@ public class Corallauncher {
 
     
     public void stopLauncher(){
-        motor.set(0);
+         motor.set(0);
 
     }
     public void intakeCoral(double intakeSpeed){
-        
+       if (stopGrab.get() == true){
         motor.set(-intakeSpeed);
+    } 
+        else{stopLauncher();}
+        
     
     }
 }

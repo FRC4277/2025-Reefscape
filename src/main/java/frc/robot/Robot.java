@@ -176,6 +176,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     drivetrain.motorCoastMode();
+    ballGrabber.stopGrabber();
   }
   
   @Override
@@ -194,49 +195,47 @@ public class Robot extends TimedRobot {
      if (controller.getPOV() == 45){
       outtakeSwitch = true;
      }
-     else if (controller.getLeftStickButtonPressed() == true){
+    if (controller.getYButtonPressed() == true){
+      System.out.println("here");
       ballGrabber.stopGrabber();
+      autoIntakeSwitch = false;
+      armDownSwitch = false;
+      armUpSwitch = true;
       intakeSwitch = false;
       outtakeSwitch = false;
       coralIntake = false;
       coralLaunch = false;
-      coralLauncher.stopLauncher();
+      
      }
      if (controller.getAButtonPressed() == true){
       autoIntakeSwitch = true;
-      /*intakeSwitch = false;
-      outtakeSwitch = false;
-      coralIntake = false;
-      coralLaunch = false;*/
-     }
-     else if (controller.getYButtonPressed() == true){
       intakeSwitch = false;
       outtakeSwitch = false;
-      armDownSwitch = false;
-      autoIntakeSwitch = false;
-      armUpSwitch = true;
+      coralIntake = false;
+      coralLaunch = false;
      }
-     else if (controller.getXButtonPressed() == true){
+    else if (controller.getXButtonPressed() == true){
       intakeSwitch = false;
       autoIntakeSwitch = false;
       outtakeSwitch = true;
       timer.delay(2);
       outtakeSwitch = false;
      }
-     else if (controller.getPOV() == 0){
+     if (controller.getPOV() == 0){
       armUpSwitch = true;
       armDownSwitch = false;
+      autoIntakeSwitch = false;
     }
       
-    else if (controller.getPOV() == 180){
+    if (controller.getPOV() == 180){
       armDownSwitch = true;
       armUpSwitch = false;
     }
-    else if (controller.getPOV() == 270){
+    if (controller.getPOV() == 270){
       outtakeSwitch = false;
       intakeSwitch = true;
     }
-    else if (controller.getLeftBumperButtonPressed() == true){
+    if (controller.getLeftBumperButtonPressed() == true){
       coralLauncher.intakeCoral(0.3);
     }
     
@@ -279,7 +278,7 @@ public class Robot extends TimedRobot {
       coralLauncher.launchCoral(0.3);
     }
     if (autoIntakeSwitch == true){
-      System.out.println("here");
+      
       if(ballGrabber.autoGrab(0.3)){
         autoIntakeSwitch = false;
       }
