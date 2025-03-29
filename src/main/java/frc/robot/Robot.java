@@ -102,8 +102,8 @@ public class Robot extends TimedRobot {
     stopperBottom = new DigitalInput(1);
     stopGrabber = new DigitalInput(3);
     stopGrab = new DigitalInput(2);
-    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom,stopGrab,relay);
-    coralLauncher = new Corallauncher(launcher,stopGrabber);
+    ballGrabber = new Ballgrabber(motor, angleMotor, stopperTop, stopperBottom,stopGrab,relay,timer);
+    coralLauncher = new Corallauncher(launcher,stopGrabber,timer);
     timer = new Timer();
 
     autonomous = new autonomousRoutines(drivetrain,ballGrabber,coralLauncher,timer);
@@ -192,12 +192,12 @@ public class Robot extends TimedRobot {
      if (controller.getPOV() == 270){
         intakeSwitch = true;
      }
-     if (controller.getPOV() == 45){
+     if (controller.getBButtonPressed()){
       outtakeSwitch = true;
      }
     if (controller.getYButtonPressed() == true){
-      System.out.println("here");
       ballGrabber.stopGrabber();
+      coralLauncher.stopLauncher();
       autoIntakeSwitch = false;
       armDownSwitch = false;
       armUpSwitch = true;
@@ -236,11 +236,13 @@ public class Robot extends TimedRobot {
       intakeSwitch = true;
     }
     if (controller.getLeftBumperButtonPressed() == true){
-      coralLauncher.intakeCoral(0.3);
+      coralIntake = true;
+      coralLaunch = false;
     }
     
     else if (controller.getRightBumperButtonPressed() == true){
-      coralLauncher.launchCoral(0.3);
+      coralIntake = false;
+      coralLaunch = true;
     }
 
 
@@ -254,7 +256,7 @@ public class Robot extends TimedRobot {
       ballGrabber.startGrabber(0.3);
      }
      if (outtakeSwitch){
-      ballGrabber.startGrabber(-0.3);
+      outtakeSwitch = ballGrabber.launchAlgae(0.4);
      }
      
      if (armUpSwitch){
@@ -271,11 +273,14 @@ public class Robot extends TimedRobot {
     }
     if (coralIntake){
       coralLaunch = false;
-      coralLauncher.intakeCoral(0.3);
+      if (coralLauncher.intakeCoral(0.05)){
+        coralIntake = false;
+      };
     }
     if (coralLaunch){
       coralIntake = false;
       coralLauncher.launchCoral(0.3);
+      coralLaunch = false;
     }
     if (autoIntakeSwitch == true){
       

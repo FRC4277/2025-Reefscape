@@ -7,6 +7,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -21,7 +22,8 @@ public class Ballgrabber {
     DigitalInput stopperBottom;
     DigitalInput grabStop;
     Relay relay;
-    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom,DigitalInput grabStop, Relay relay){
+    Timer timer;
+    public Ballgrabber(SparkFlex motor,SparkMax angleMotor,DigitalInput stopperTop, DigitalInput stopperBottom,DigitalInput grabStop, Relay relay,Timer timer){
         
         this.angleMotor = angleMotor;
         this.motor = motor;
@@ -29,6 +31,7 @@ public class Ballgrabber {
         this.stopperBottom = stopperBottom;
         this.relay = relay;
         this.grabStop = grabStop;
+        this.timer = timer;
         SparkFlexConfig config = new SparkFlexConfig();
         config.idleMode(IdleMode.kBrake);
         config.inverted(true);
@@ -52,12 +55,18 @@ public class Ballgrabber {
     public void stopGrabber(){
         motor.set(0);
     }
+    public boolean launchAlgae(double setSpeed){
+        motor.set(-setSpeed);
+        timer.delay(0.5);
+        stopGrabber();
+        return false;
+    }
 
     public boolean angleChangePos(){
         magneton();
         if (stopperTop.get()){
             
-            angleMotor.set(.2);
+            angleMotor.set(0.3);
             return true;
         }
         stopAngleChange();
